@@ -42,6 +42,7 @@ public class DialogueCreator : MonoBehaviour, EventPublisher<CharSequenceEventAr
         //Debug.Log("It worked! " + LastAcked + " " + LastOutgoing + " " + eventArgs.EventId);
     }
 
+    // TODO: Make into a setter? or extend functionality?
     public void BeginConvesation(Conversation conversation) {
         this.Conversation = conversation;
     }
@@ -79,7 +80,6 @@ public class DialogueCreator : MonoBehaviour, EventPublisher<CharSequenceEventAr
     }
 
     private IEnumerator SendDialogue(string dialogueLine) {
-        float deltaTime = 0f;
         // send the full String for other use;
         PublishEvent(new CharSequenceEventArgs(dialogueLine, System.Guid.NewGuid(), CharSequenceEventArgs.Type.CharSequence, CharSequenceEventArgs.PrintMode.SingleChar, Conversation.Id));
 
@@ -87,7 +87,6 @@ public class DialogueCreator : MonoBehaviour, EventPublisher<CharSequenceEventAr
       
             char[] character = {ch};
             PublishEvent(new CharSequenceEventArgs(new string(character), System.Guid.NewGuid(), CharSequenceEventArgs.Type.CharSequence, CharSequenceEventArgs.PrintMode.SingleChar, Conversation.Id));
-            deltaTime = 0f;
             Debug.Log("Sending: " + new string(character));
             yield return new WaitForSeconds(0.1f);
         }
