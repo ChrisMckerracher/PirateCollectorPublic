@@ -26,8 +26,5 @@ public class CharSequenceEventArgs : AckableEventArgs {
         SingleChar, FullLine
     }
 
-    public override void Accept(object? sender, EventSystemVisitor visitor) {
-        visitor.Visit(sender, this);
-    }
-
 }
+

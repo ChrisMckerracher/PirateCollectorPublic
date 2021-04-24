@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using System;
 
-public interface AckListener {
+interface AckListener {
 
     #nullable enable
     void HandleAck(object? from, AckableEventArgs eventArgs);
