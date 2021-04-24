@@ -23,13 +23,12 @@ public class DialogueCreator : MonoBehaviour, EventPublisher<CharSequenceEventAr
         EventSystem.Instance.OnAdvanceCharSequenceEvent += HandleAdvanceConversation;
         //NextLine("this is a test");
         string[] dialogues = {"thisis a test", "here is the next line"};
-        Conversation = new Conversation() {
+        Conversation Convo = new Conversation() {
             Dialogue = dialogues,
             Id = System.Guid.NewGuid()
         };
 
-        ConversationEnumerator = Conversation.ReadConversation();
-        NextLine();
+        BeginConversation(Convo);
     }
 
     void FixedUpdate() {
@@ -43,11 +42,19 @@ public class DialogueCreator : MonoBehaviour, EventPublisher<CharSequenceEventAr
     }
 
     // TODO: Make into a setter? or extend functionality?
-    public void BeginConvesation(Conversation conversation) {
+    public void BeginConversation(Conversation conversation) {
         this.Conversation = conversation;
+        ConversationEnumerator = Conversation.ReadConversation();
+        PublishEvent(new InitiateCharSequenceEventArgs(System.Guid.NewGuid(), conversation.Id));
+        NextLine();
     }
 
     public void PublishEvent(CharSequenceEventArgs eventArgs) {
+        LastOutgoing = eventArgs.EventId;
+        EventSystem.Instance.HandleEvent(this, eventArgs);
+    }
+
+    public void PublishEvent(InitiateCharSequenceEventArgs eventArgs) {
         LastOutgoing = eventArgs.EventId;
         EventSystem.Instance.HandleEvent(this, eventArgs);
     }
@@ -60,6 +67,7 @@ public class DialogueCreator : MonoBehaviour, EventPublisher<CharSequenceEventAr
     }
 
     public void NextLine() {
+        Debug.Log("yes new line");
         if (ActiveDialogue != null)
             StopCoroutine(ActiveDialogue);
 
