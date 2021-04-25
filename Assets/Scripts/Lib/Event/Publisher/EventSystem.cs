@@ -8,8 +8,8 @@ public class EventSystem : MonoBehaviour {
     public event EventHandler<AckableEventArgs> OnAckableEvent;
     public event EventHandler<CharSequenceEventArgs> OnCharSequenceEvent;
     public event EventHandler<AdvanceCharSequenceEventArgs> OnAdvanceCharSequenceEvent;
-
     public event EventHandler<InitiateCharSequenceEventArgs> OnIniateCharSequenceEvent;
+    public event EventHandler<CancelCharSequenceEventArgs> OnCancelCharSequenceEvent;
 
     private static EventSystem _instance;
 
@@ -51,7 +51,7 @@ public class EventSystem : MonoBehaviour {
 
     
     public void HandleEvent(object? sender, InitiateCharSequenceEventArgs eventArgs) {
-        Debug.Log("We have recieved a AdvanceCharSequenceEventArgs");
+        Debug.Log("We have recieved a InitiateCharSequenceEventArgs");
         if (OnIniateCharSequenceEvent != null) {
             OnIniateCharSequenceEvent(sender, eventArgs);
         }
@@ -59,6 +59,11 @@ public class EventSystem : MonoBehaviour {
     }
 
     public void HandleEvent(object? sender, CancelCharSequenceEventArgs eventArgs) {
+        Debug.Log("We have recieved a CancelCharSequenceEventArgs");
+        if (OnCancelCharSequenceEvent != null) {
+            OnCancelCharSequenceEvent(sender, eventArgs);
+        }
+        OnAckableEvent(sender, eventArgs);
     }
 
 }

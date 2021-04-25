@@ -49,12 +49,14 @@ public class ConversationController : MonoBehaviour {
         if (ActiveDialogue != null)
             StopCoroutine(ActiveDialogue);
 
-        if (ConversationEnumerator != null && ConversationEnumerator.MoveNext()) {
+        if (ConversationEnumerator != null && ConversationEnumerator.MoveNext() && ConversationEnumerator.Current != null && ConversationEnumerator.Current != "") {
+            Debug.Log("Convo value: " + ConversationEnumerator.Current);
             ActiveDialogue = StartCoroutine(SendDialogue(ConversationEnumerator.Current));
         }
-        else
+        else {
             StopCoroutine(ActiveDialogue);
             DialogueEventPublisher.PublishEvent(new CharSequenceEventArgs("END", System.Guid.NewGuid(), CharSequenceEventArgs.Type.End, CharSequenceEventArgs.PrintMode.SingleChar, Conversation.Id));
+        }
     }
 
     public void CancelDialogue() {
@@ -77,6 +79,7 @@ public class ConversationController : MonoBehaviour {
         }
 
         DialogueEventPublisher.PublishEvent(new CharSequenceEventArgs("\n", System.Guid.NewGuid(), CharSequenceEventArgs.Type.NewLine, CharSequenceEventArgs.PrintMode.SingleChar, Conversation.Id));
+
         yield break;
     }
 
