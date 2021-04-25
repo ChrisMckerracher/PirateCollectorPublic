@@ -9,7 +9,7 @@ public class ConversationUIViewController : MonoBehaviour {
     //TODO: Still maybe, Dialogue collections could be in their own class, maybe View class
     public Text DialogueText;
     public Button NextButton;
-
+    public Button EndButton;
     public Guid ConversationId;
 
     public DialogueController DialogueController;
@@ -21,19 +21,24 @@ public class ConversationUIViewController : MonoBehaviour {
     }
 
     public void HandleInitiateConversationEvent(object? sender, InitiateCharSequenceEventArgs eventArgs) {
-        Debug.Log("initated");
+        Debug.Log("Conversation initiated: " + eventArgs.ConversationId);
         this.ConversationId = eventArgs.ConversationId;
         DialogueController.ResetConversation(this);
     }
 
     public void HandleEndConversationEvent(object? sender, CancelCharSequenceEventArgs eventArgs) {
-
+        Debug.Log("Conversation ended: " + eventArgs.ConversationId);
     }
 
     public void NextLine() {
         DialogueController.NextLine(this);
         DialogueText.text = "";
         AdvanceCharSequenceEventArgs eventArgs = new AdvanceCharSequenceEventArgs(System.Guid.NewGuid(), ConversationId);
+        EventSystem.Instance.HandleEvent(this, eventArgs);
+    }
+
+    public void EndConversation() {
+        CancelCharSequenceEventArgs eventArgs = new CancelCharSequenceEventArgs(System.Guid.NewGuid(), ConversationId);
         EventSystem.Instance.HandleEvent(this, eventArgs);
     }
 
