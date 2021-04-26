@@ -73,7 +73,7 @@ public class ConversationController : MonoBehaviour {
             char[] character = {ch};
             DialogueEventPublisher.PublishEvent(new CharSequenceEventArgs(new string(character), System.Guid.NewGuid(), CharSequenceEventArgs.Type.CharSequence, CharSequenceEventArgs.PrintMode.SingleChar, Conversation.Id));
             Debug.Log("Sending: " + new string(character));
-            yield return new WaitForSeconds(0.1f);
+            yield return new WaitForSeconds(0.01f);
         }
 
         DialogueEventPublisher.PublishEvent(new CharSequenceEventArgs("\n", System.Guid.NewGuid(), CharSequenceEventArgs.Type.NewLine, CharSequenceEventArgs.PrintMode.SingleChar, Conversation.Id));
