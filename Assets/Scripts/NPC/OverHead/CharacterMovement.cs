@@ -3,16 +3,23 @@ using System.Collections.Generic;
 using System;
 using UnityEngine;
 
+
+// I ran into problems running character update logic into update, and thus may want to consider keeping it in fixed update
+// this was due to the fact that sometimes multiple fixed update loops happened between updates, making the npc move more than expected
 public class CharacterMovement : MonoBehaviour {
     public Animator Animator;
     public Rigidbody2D rigidBody2D;
     public float MoveSpeed = 5f;
 
-    public ChainableCoroutine chainable;
+    public ChainableIEnumerable chainable;
 
     private Vector2 Movement;
-    private bool running = false;
+    public bool running = true;
     // Update is called once per frame
+
+    private float howLongIgnore;
+    private IEnumerable test;
+    private IEnumerator testEnum;
 
     void Start() {
         Movement.x = 0;
@@ -20,10 +27,6 @@ public class CharacterMovement : MonoBehaviour {
     }
 
     void Update() {
-        if (!running) {
-            running = true;
-            resetCycle();
-        }
 
         float sqrMagnitude = Movement.sqrMagnitude;
 
@@ -36,6 +39,12 @@ public class CharacterMovement : MonoBehaviour {
     }
 
     private void FixedUpdate() {
+        
+        if (test == null || !testEnum.MoveNext()) {
+            Debug.Log("resetting");
+            test = resetCycle()();
+            testEnum = test.GetEnumerator();
+        }
         rigidBody2D.MovePosition(rigidBody2D.position + Movement * MoveSpeed * Time.deltaTime);
     }
 
@@ -43,9 +52,9 @@ public class CharacterMovement : MonoBehaviour {
     public bool isPaused = false;
 
     public int movementInterval = 10;
-    private IEnumerator WalkLeft() {
+    private IEnumerable WalkLeft() {
+        Debug.Log("Walk Left");
         for (int i = 0; i < movementInterval; i++) {
-            Debug.Log(i);
             if (isStopped) {
                 Movement.x = 0;
                 Movement.y = 0;
@@ -64,12 +73,15 @@ public class CharacterMovement : MonoBehaviour {
             Movement.y = 0;
             yield return new WaitForSeconds(Time.fixedDeltaTime);
         }
-        Debug.Log("done");
+        Movement.x = 0;
+        Movement.y = 0;
+        Debug.Log(rigidBody2D.position);
+
     }
 
-    private IEnumerator WalkRight() {
+    private IEnumerable WalkRight() {
+        Debug.Log("Walk Right");
         for (int i = 0; i < movementInterval; i++) {
-            Debug.Log(i);
             if (isStopped) {
                 Movement.x = 0;
                 Movement.y = 0;
@@ -88,17 +100,21 @@ public class CharacterMovement : MonoBehaviour {
             yield return new WaitForSeconds(Time.fixedDeltaTime);
         }
 
+        Movement.x = 0;
+        Movement.y = 0;
+        Debug.Log(rigidBody2D.position);
+
+
     }
 
-    private Coroutine resetCycle() {
-        Func<Coroutine> walkLeft = () => { return StartCoroutine(WalkLeft()); };
-        Func<Coroutine> walkRight = () => { return StartCoroutine(WalkRight()); };
-        //TimeoutCoroutineRequest walkLeftRequest = new TimeoutCoroutineRequest(10f, 5, walkLeft);
-        //TimeoutCoroutineRequest walkRightRequest = new TimeoutCoroutineRequest(10f, 5, walkRight);
-        //TimeoutCoroutineRequest[] requests = {walkLeftRequest, walkRightRequest, walkRightRequest, walkLeftRequest};
-        Func<Coroutine>[] requests = {walkLeft, walkRight, walkRight, walkLeft};
+    public bool left = false;
+    private Func<IEnumerable> resetCycle() {
 
-        return StartCoroutine(chainable.chain(requests));
+        Func<IEnumerable> walkLeft = () => { return WalkLeft(); };
+        Func<IEnumerable> walkRight = () => { return WalkRight(); };
+        Func<IEnumerable>[] requests = {walkRight, walkLeft};
+
+        return () => {return chainable.chain(requests);};
     }
 
     private void PlayerMovement() {
