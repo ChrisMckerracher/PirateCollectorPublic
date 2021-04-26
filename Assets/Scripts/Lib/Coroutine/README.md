@@ -1,0 +1,1 @@
+Do NOT use these classes/scripts if you need the coroutines to manage state directly viewable to the user. There is no gaurantee it will line up perfectly as a synchronous flow would
